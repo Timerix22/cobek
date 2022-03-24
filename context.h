@@ -11,4 +11,5 @@ struct ContextStruct{
     Autoarr(Context) children;
     Autoarr(Command) commandChain;
     Autoarr(Constant) constantStack;
+    bool isPartial; // if true, not-defined members won't throw NotDefinedError before linkage
 }

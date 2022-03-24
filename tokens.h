@@ -41,10 +41,20 @@ typedef enum TokenId{
     tok_import,
     tok_alias,
     // access modifiers
+    tok_static,
     tok_const,
+    tok_readonly,
     tok_protected,
+    tok_internal,
     tok_public,
     tok_virtual,
+    tok_override,
+    tok_partial,
+    // allocation keywords
+    tok_halloc, // allocates struct in heap
+    tok_malloc, // allocates bytes in stack
+    tok_sizeof, // size of variable value
+    tok_typeof, // type of variable
     // user-defined
     tok_label,
     tok_number,
