@@ -1,10 +1,10 @@
 #pragma once
+#include "../../../kerep/src/Autoarr/Autoarr.h"
 #include "commands.h"
 
-struct ContextStruct;
-typedef ContextStruct Context;
+typedef struct ContextStruct Context;
 
-Autoarr_declare(Context);
+Autoarr_declare(Context)
 
 struct ContextStruct{
     Context* parent;
@@ -12,4 +12,4 @@ struct ContextStruct{
     Autoarr(Command) commandChain;
     Autoarr(Constant) constantStack;
     bool isPartial; // if true, not-defined members won't throw NotDefinedError before linkage
-}
+};

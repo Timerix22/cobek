@@ -1,23 +1,24 @@
 #pragma once
-#include "../kerep/base/std.h"
+
+#include "../../../kerep/src/base/base.h"
 
 typedef enum TokenId{
     // base types
-    tok_void,
-    tok_int8,
-    tok_uint8,
-    tok_int16,
-    tok_uint16,
-    tok_int32,
-    tok_uint32,
-    tok_int64,
-    tok_uint64,
-    tok_char,      //ascii
-    tok_char8,     //utf8
-    tok_char16,    //utf16
-    tok_bool,
-    tok_float32,
-    tok_float64,
+    tok_void_t,
+    tok_int8_t,
+    tok_uint8_t,
+    tok_int16_t,
+    tok_uint16_t,
+    tok_int32_t,
+    tok_uint32_t,
+    tok_int64_t,
+    tok_uint64_t,
+    tok_char_t,      //ascii
+    tok_char8_t,     //utf8
+    tok_char16_t,    //utf16
+    tok_bool_t,
+    tok_float32_t,
+    tok_float64_t,
     // constant
     tok_null,
     tok_true,
@@ -58,7 +59,7 @@ typedef enum TokenId{
     // user-defined
     tok_label,
     tok_number,
-    tok_char,
+    tok_character,
     tok_string,
     tok_comment,
     // special characters
@@ -103,3 +104,4 @@ typedef struct Token{
     char* value;
     TokenId id;
 } Token;
+

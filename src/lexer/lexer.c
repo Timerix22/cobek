@@ -1,9 +1,36 @@
-#include "cobek_compiler.h"
+#include "lexer.h"
 
 Autoarr_define(Token);
 
+typedef struct SourceFileInfo{
+    char* _source;
+    char* _filename;
+    Autoarr(Token)* _tokens;
+    string _context;
+    string _line;
+    string _label;
+    uint32 _linenum;
+    uint32 _charnum;
+} SourceFileInfo;
 
-char charFromEscapeStr(string estr){
+#define source sfi->_source
+#define filename sfi->_filename
+#define tokens sfi->_tokens
+#define context sfi->_context
+#define line sfi->_line
+#define label sfi->_label
+#define linenum sfi->_linenum
+#define charnum sfi->_charnum
+
+Maybe _throw_wrongchar(SourceFileInfo* sfi){
+    char* errline=string_extract(line);
+    printf("\n\e[91mwrong char <%c> at [%s:%u:%u %s]\n >>> %s\n",
+                source[charnum], filename,linenum,charnum,context, errline);
+    exit(96);
+}
+#define throw_wrongchar(freeMem) { freeMem; _throw_wrongchar(sfi); }
+
+char _charFromEscapeStr(string estr, SourceFileInfo* sfi){
     if(*estr.ptr!='\\') throw("first char is not \\");
     switch(*(++estr.ptr)){
         case 'n': return '\n';
@@ -13,27 +40,25 @@ char charFromEscapeStr(string estr){
         case '\\': return '\\';
         case '"': return '"';
         case '\'': return '\'';
-        default: throw(ERR_WRONGCHAR);    
+        default: throw_wrongchar(;);
     }
 }
+#define charFromEscapeStr(estr) _charFromEscapeStr(estr, sfi)
 
-
-Autoarr(Token)* lexan(char* source, char* filename){
-    Autoarr(Token)* tokens=malloc(sizeof(Autoarr(Token)));
-    *tokens=Autoarr_create(Token,64,1024);
-    char c;
-    string label={source,0};
-    string line={source,0};
-    uint32 linenum;
-    uint32 cnum;
-    
-    
-    void throw_wrongchar(){
-        char* errline=string_cpToCharPtr(line);
-        printf("\n\e[91mwrong char <%c> at [%s:%u:%u %s]\n >>> %s\n" ,filename,linenum,cnum,c,errline);
-        exit(96);
+Autoarr(Token)* lexan(char* _source, char* _filename){
+    SourceFileInfo sfi={
+        ._source=_source,
+        ._filename=_filename,
+        ._tokens=Autoarr_create(Token,64,1024),
+        ._label={_source,0},
+        ._line={_source,0},
+        ._linenum=0,
+        ._charnum=0
     };
-    
+    return _lexan(&sfi);
+}
+
+Autoarr(Token)* _lexan(SourceFileInfo* sfi){
     
     void addlabel(){
         if(label.length==0) return;

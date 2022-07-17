@@ -1,10 +1,9 @@
 #pragma once
-#include "tokens.h"
-#include "context.h"
 
-Autoarr_declare(Token);
-
-Autoarr(Token)* lexan(char* source, char* filename);
+#include "../../../kerep/src/String/StringBuilder.h"
+#include "../lexer/lexer.h"
+#include "Assembly.h"
+#include "Context.h"
 
 Context* parse(Autoarr(Token)* tokens);
 
