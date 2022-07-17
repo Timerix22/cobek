@@ -52,8 +52,7 @@ typedef enum TokenId{
     tok_override,
     tok_partial,
     // allocation keywords
-    tok_halloc, // allocates struct in heap
-    tok_malloc, // allocates bytes in stack
+    tok_new, // allocates struct in heap
     tok_sizeof, // size of variable value
     tok_typeof, // type of variable
     // user-defined
@@ -92,7 +91,7 @@ typedef enum TokenId{
     tok_point,       // .
     tok_comma,       // ,
     tok_tilda,       // ~
-    tok_backslash,   // \
+    tok_backslash,   // \ /
     tok_percent,     // %
     tok_xor,         // ^
     tok_lattice,     // #
@@ -105,3 +104,91 @@ typedef struct Token{
     TokenId id;
 } Token;
 
+static const Token default_tokens[]={
+    // base types
+    {"void", tok_void_t},
+    {"int8", tok_int8_t},
+    {"uint8", tok_uint8_t},
+    {"int16", tok_int16_t},
+    {"uint16", tok_uint16_t},
+    {"int32", tok_int32_t},
+    {"uint32", tok_uint32_t},
+    {"int64", tok_int64_t},
+    {"uint64", tok_uint64_t},
+    {"char", tok_char_t},
+    {"char8", tok_char8_t},
+    {"char16", tok_char16_t},
+    {"bool", tok_bool_t},
+    {"float32", tok_float32_t},
+    {"float64", tok_float64_t},
+    // constant
+    {"null", tok_null},
+    {"true", tok_true},
+    {"false", tok_false},
+    // control flow operators
+    {"if", tok_if},
+    {"else", tok_else},
+    {"for", tok_for},
+    {"while", tok_while},
+    {"switch", tok_switch},
+    {"case", tok_case},
+    {"brake", tok_brake},
+    {"braketo", tok_braketo},
+    {"return", tok_return},
+    {"goto", tok_goto},
+    // declaration keywords
+    {"struct", tok_struct},
+    {"enum", tok_enum},
+    {"union", tok_union},
+    {"event", tok_event},
+    {"import", tok_import},
+    {"alias", tok_alias},
+    // access modifiers
+    {"static", tok_static},
+    {"const", tok_const},
+    {"readonly", tok_readonly},
+    {"protected", tok_protected},
+    {"internal", tok_internal},
+    {"public", tok_public},
+    {"virtual", tok_virtual},
+    {"override", tok_override},
+    {"partial", tok_partial},
+    // allocation keywords
+    {"new", tok_new},
+    {"sizeof", tok_sizeof},
+    {"typeof", tok_typeof},
+    // special characters
+    {"(", tok_lbracket},
+    {"{", tok_lbracket_fi},
+    {"[", tok_lbracket_sq},
+    {")", tok_rbracket},
+    {"}", tok_rbracket_fi},
+    {"]", tok_rbracket_sq},
+    {"<", tok_less},
+    {">", tok_more},
+    {"+", tok_plus},
+    {"-", tok_minus},
+    {"*", tok_asterisk},
+    {"/", tok_slash},
+    {"=", tok_assign},
+    {"!", tok_not},
+    {"==", tok_equals},
+    {"!=", tok_not_equals},
+    {"&", tok_and},
+    {"&&", tok_and_d},
+    {"|", tok_or},
+    {"||", tok_or_d},
+    {"?", tok_question},
+    {"??", tok_question_d},
+    {":", tok_colon},
+    {";", tok_semicolon},
+    {".", tok_point},
+    {",", tok_comma},
+    {"~", tok_tilda},
+    {"\\", tok_backslash},
+    {"%", tok_percent},
+    {"^", tok_xor},
+    {"#", tok_lattice},
+    {"$", tok_dollar},
+    {"@", tok_at}
+};
