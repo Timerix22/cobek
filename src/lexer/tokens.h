@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../../../kerep/src/base/base.h"
+#include "../../../kerep/src/Autoarr/Autoarr.h"
+#include "../../../kerep/src/SearchTree/SearchTree.h"
+#include "my_type_ext.h"
 
 typedef enum TokenId{
     // base types
@@ -35,6 +37,7 @@ typedef enum TokenId{
     tok_return,
     tok_goto,
     // declaration keywords
+    tok_class,
     tok_struct,
     tok_enum,
     tok_union,
@@ -55,12 +58,6 @@ typedef enum TokenId{
     tok_new, // allocates struct in heap
     tok_sizeof, // size of variable value
     tok_typeof, // type of variable
-    // user-defined
-    tok_label,
-    tok_number,
-    tok_character,
-    tok_string,
-    tok_comment,
     // special characters
     tok_lbracket,    // (
     tok_lbracket_fi, // {
@@ -68,8 +65,6 @@ typedef enum TokenId{
     tok_rbracket,    // )
     tok_rbracket_fi, // }
     tok_rbracket_sq, // ]
-    //tok_quot,        // '
-    //tok_quot_d,      // "
     tok_less,        // <
     tok_more,        // >
     tok_plus,        // +
@@ -96,13 +91,24 @@ typedef enum TokenId{
     tok_xor,         // ^
     tok_lattice,     // #
     tok_dollar,      // $
-    tok_at           // @
+    tok_at,           // @
+    // user-defined
+    tok_label,
+    tok_number,
+    tok_character,
+    tok_string,
+    tok_comment
 } __attribute__((__packed__)) TokenId;
 
 typedef struct Token{
     char* value;
     TokenId id;
 } Token;
+
+static STNode* keywordsSearchTree;
+// dont forget to free it
+void init_keywordsSearchTree();
+
 
 static const Token default_tokens[]={
     // base types
@@ -137,6 +143,7 @@ static const Token default_tokens[]={
     {"return", tok_return},
     {"goto", tok_goto},
     // declaration keywords
+    {"class", tok_class},
     {"struct", tok_struct},
     {"enum", tok_enum},
     {"union", tok_union},
@@ -192,3 +199,5 @@ static const Token default_tokens[]={
     {"$", tok_dollar},
     {"@", tok_at}
 };
+
+Autoarr_declare(Token)
