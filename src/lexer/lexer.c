@@ -25,7 +25,7 @@ Maybe _throw_wrongchar(SharedLexerData* sld){
     char* errline=string_extract(line);
     char* _context=string_extract(context);
     printf("\n\e[91mwrong char <%c> at [%s:%u:%u %s]\n >>> %s\n",
-                source[charnum], filename,linenum,charnum,context, errline);
+                source[charnum], filename,linenum,charnum,_context, errline);
     exit(96);
 }
 #define throw_wrongchar(freeMem) { freeMem; return _throw_wrongchar(sld); }
