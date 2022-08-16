@@ -7,9 +7,7 @@ clear_dir "$OUTDIR"
 clear_dir "$OBJDIR"
 
 cd kerep
-if [ ! -f "bin/kerep.a" ]; then
-    make build_static_lib
-fi
+make build_static_lib
 cp bin/kerep.a ../obj/
 printf "${GREEN}copied ${CYAN}kerep.a\n"
 cd ..

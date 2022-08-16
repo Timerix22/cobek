@@ -7,13 +7,11 @@ clear_dir "$OUTDIR"
 clear_dir "$OBJDIR"
 
 cd kerep
-if [ ! -f "bin/kerep.a" ]; then
-    make build_static_lib_dbg
-fi
+make build_static_lib_dbg
 cp bin/kerep.a ../obj/
 printf "${GREEN}copied ${CYAN}kerep.a\n"
 cd ..
 
 compile_c "$BUILD_DBG_C_ARGS" "$SRC_C"
 compile_cpp "$BUILD_DBG_CPP_ARGS" "$SRC_CPP"
-link "$BUILD_DBG_CPP_ARGS $BUILD_DBG_LINKER_ARGS" "$BUILD_FILE"
+link "$BUILD_DBG_CPP_ARGS $BUILD_DBG_LINKER_ARGS" "$BUILD_DBG_FILE"
