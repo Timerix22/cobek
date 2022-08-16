@@ -105,7 +105,7 @@ typedef struct Token{
     TokenId id;
 } Token;
 
-static STNode* keywordsSearchTree;
+extern STNode* keywordsSearchTree;
 // dont forget to free it
 void init_keywordsSearchTree();
 

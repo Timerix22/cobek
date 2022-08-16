@@ -4,5 +4,6 @@
 
 
 typedef enum lexer_type{
-    AutoarrTokenPtr=my_type_last+1
+    TokenPtr=my_type_last+1, 
+    AutoarrTokenPtr
 } lexer_type;
