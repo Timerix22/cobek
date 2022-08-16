@@ -7,7 +7,7 @@ source build_scripts/colors.sh
 source build_scripts/functions.sh
 
 if [ ! -f ".config" ]; then
-    print "${YELLOW}./.config doesn't exists\n"
+    print "${YELLOW}./.config doesn't exist\n"
     cp build_scripts/default.config.sh .config
     print "${YELLOW}default config created\n"
     while true; do
@@ -21,3 +21,5 @@ if [ ! -f ".config" ]; then
     done
 fi
 source .config
+
+bash build_scripts/build_deps.sh
