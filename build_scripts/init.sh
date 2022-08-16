@@ -1,6 +1,5 @@
 #!/bin/bash
 
-reset
 tabs 4
 
 source build_scripts/colors.sh
@@ -21,5 +20,3 @@ if [ ! -f ".config" ]; then
     done
 fi
 source .config
-
-bash build_scripts/build_deps.sh

@@ -11,4 +11,3 @@ obj/
 *.user
 *.vcxproj.filters
 .config
-deps/kerep.a

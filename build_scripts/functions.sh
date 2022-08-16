@@ -59,7 +59,8 @@ function link {
     print "${BLUE}args: ${GRAY}$args\n"
     local outfile=$OUTDIR/$2
     print "${BLUE}outfile: ${GRAY}$outfile\n"
-    local objects="$(find $OBJDIR -name *.o)"
+    local objects="$(find $OBJDIR -name *.o)
+$(find $OBJDIR -name *.a)"
     print "${BLUE}objects: ${GRAY}$objects\n"
     if $CMP_CPP $args -o $outfile $(echo $objects | tr '\n' ' ')
     then 
