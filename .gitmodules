@@ -1,3 +1,6 @@
 [submodule "kerep"]
 	path = kerep
 	url = https://github.com/Timerix22/kerep.git
+[submodule "cbuild"]
+	path = cbuild
+	url = https://github.com/Timerix22/cbuild.git
