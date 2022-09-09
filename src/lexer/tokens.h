@@ -2,7 +2,6 @@
 
 #include "../../../kerep/src/Autoarr/Autoarr.h"
 #include "../../../kerep/src/SearchTree/SearchTree.h"
-#include "my_type_ext.h"
 
 typedef enum TokenId{
     // base types
@@ -104,6 +103,12 @@ typedef struct Token{
     char* value;
     TokenId id;
 } Token;
+ktId_declare(ktId_Token);
+ktId_declare(ktId_TokenPtr);
+
+Autoarr_declare(Token)
+ktId_declare(ktId_AutoarrToken);
+ktId_declare(ktId_AutoarrTokenPtr);
 
 extern STNode* keywordsSearchTree;
 // dont forget to free it
@@ -199,5 +204,3 @@ static const Token default_tokens[]={
     {"$", tok_dollar},
     {"@", tok_at}
 };
-
-Autoarr_declare(Token)

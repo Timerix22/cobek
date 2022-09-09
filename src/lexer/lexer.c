@@ -46,9 +46,9 @@ void _addTok_ifnext(char next, TokenId yes, TokenId no, SharedLexerData* sld){
 // adds <label> to <tokens> as tok_label or tok_number
 void _tryAddLabel(SharedLexerData* sld){
     if(label.length==0) return;
-    Unitype fake_uni=ST_pullString(keywordsSearchTree,label);
-    if(fake_uni.VoidPtr!=NULL) // built-in keyword
-        Autoarr_add(tokens, *(Token*)(void*)&fake_uni);
+    Unitype uni=ST_pullString(keywordsSearchTree,label);
+    if(uni.VoidPtr!=NULL) // built-in keyword
+        Autoarr_add(tokens, *(Token*)uni.VoidPtr);
     else {          // user-defined label
         Token ut;
         ut.value=string_extract(label);
@@ -80,7 +80,7 @@ Maybe _readString(char quotChar, SharedLexerData* sld){
             else { // "
                 string str={srcFirst, source-srcFirst+1};
                 char* extracted=string_extract(str);
-                return SUCCESS(UniPtr(CharPtr, extracted));
+                return SUCCESS(UniHeap(ktId_CharPtr, extracted));
             }
         } 
         else prevIsBackslash= c=='\\' && !prevIsBackslash;
@@ -255,7 +255,7 @@ Maybe _lexan(SharedLexerData* sld){
             break;
     }
     
-    return SUCCESS(UniPtr(AutoarrTokenPtr,tokens));
+    return SUCCESS(UniHeap(ktId_AutoarrTokenPtr,tokens));
 }
 
 
