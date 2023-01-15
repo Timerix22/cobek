@@ -80,7 +80,7 @@ Maybe _readString(char quotChar, SharedLexerData* sld){
             else { // "
                 string str={srcFirst, source-srcFirst+1};
                 char* extracted=string_extract(str);
-                return SUCCESS(UniHeap(ktId_CharPtr, extracted));
+                return SUCCESS(UniHeapPtr(char, extracted));
             }
         } 
         else prevIsBackslash= c=='\\' && !prevIsBackslash;
@@ -255,7 +255,7 @@ Maybe _lexan(SharedLexerData* sld){
             break;
     }
     
-    return SUCCESS(UniHeap(ktId_AutoarrTokenPtr,tokens));
+    return SUCCESS(UniHeapPtr(Autoarr(Token), tokens));
 }
 
 

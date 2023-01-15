@@ -103,12 +103,8 @@ typedef struct Token{
     char* value;
     TokenId id;
 } Token;
-ktId_declare(ktId_Token);
-ktId_declare(ktId_TokenPtr);
-
+ktid_declare(Token);
 Autoarr_declare(Token)
-ktId_declare(ktId_AutoarrToken);
-ktId_declare(ktId_AutoarrTokenPtr);
 
 extern STNode* keywordsSearchTree;
 // dont forget to free it
