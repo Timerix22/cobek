@@ -1,4 +1,10 @@
 ######      Build cbuild/default_tasks     #######
+
+all: build_exec
+
+rebuild_kerep:
+	@cbuild/call_task.sh rebuild_kerep
+
 build_exec: 
 	@cbuild/call_task.sh build_exec
 build_exec_dbg: 
@@ -19,6 +25,4 @@ exec: build_exec
 	@cbuild/call_task.sh exec
 
 valgrind: build_exec_dbg
-	@cbuild/call_task.sh valgrind
-
-all: build_exec
+	@cbuild/call_task.sh 
