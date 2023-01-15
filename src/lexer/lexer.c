@@ -1,5 +1,5 @@
 #include "lexer.h"
-#include "../../../kerep/src/String/string.h"
+#include "../../kerep/src/String/string.h"
 
 typedef struct SharedLexerData{
     char* _source;

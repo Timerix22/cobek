@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../kerep/src/Autoarr/Autoarr.h"
-#include "../../../kerep/src/SearchTree/SearchTree.h"
+#include "../../kerep/src/Autoarr/Autoarr.h"
+#include "../../kerep/src/SearchTree/SearchTree.h"
 
 typedef enum TokenId{
     // base types

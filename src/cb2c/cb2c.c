@@ -1,5 +1,5 @@
 #include "cb2c.h"
-#include "../../../kerep/src/String/StringBuilder.h"
+#include "../../kerep/src/String/StringBuilder.h"
 
 void namespaceToC(NamespaceContext* context, StringBuilder* b){
     
