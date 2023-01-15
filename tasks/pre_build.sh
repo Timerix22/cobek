@@ -1,7 +1,9 @@
 #!/bin/bash
 
 cd kerep
-make $KEREP_BUILD_TASK
+if [ ! -f "bin/kerep.a" ]; then
+    exec make "$KEREP_BUILD_TASK"
+fi
 cp bin/kerep.a ../obj/
 printf "${GREEN}copied ${CYAN}kerep.a\n"
 cd ..
