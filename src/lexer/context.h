@@ -19,17 +19,11 @@ struct ContextStruct {
 };
 
 typedef struct NamespaceContext{
-    union {
-        Context base;
-        Context;
-    };
+    Context base;
 } NamespaceContext;
 
 typedef struct FunctionContext {
-    union {
-        Context base;
-        Context;
-    };
+    Context base;
     Autoarr(Token)* arguments;
     Autoarr(Token)* attributes;
     Token accessModifier;
@@ -37,10 +31,7 @@ typedef struct FunctionContext {
 } FunctionContext;
 
 typedef struct ClassContext {
-    union {
-        Context base;
-        Context;
-    };
+    Context base;
     Autoarr(Token)* attributes;
     Token accessModifier;
 } ClassContext;
