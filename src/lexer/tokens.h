@@ -3,7 +3,7 @@
 #include "../../kerep/src/Autoarr/Autoarr.h"
 #include "../../kerep/src/SearchTree/SearchTree.h"
 
-typedef enum TokenId{
+PACK_ENUM(TokenId,
     // base types
     tok_void_t,
     tok_int8_t,
@@ -97,7 +97,7 @@ typedef enum TokenId{
     tok_character,
     tok_string,
     tok_comment
-} __attribute__((__packed__)) TokenId;
+)
 
 typedef struct Token{
     char* value;

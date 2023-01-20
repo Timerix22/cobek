@@ -5,11 +5,11 @@
 
 typedef struct ContextStruct Context;
 
-typedef enum ContextType{ 
+PACK_ENUM(ContextType,
     CT_Namespace,
     CT_Function,
     CT_Class
-} __attribute__((__packed__))  ContextType;
+)
 
 struct ContextStruct {
     char* name;

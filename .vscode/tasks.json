@@ -30,12 +30,13 @@
       },
 
       {
-        "label": "build_dbg",
+        "label": "build_cb2c_dbg",
         "detail": "build project with debug symbols",
         "type": "cppbuild",
         "command": "make",
         "args": [
-            "build_dbg"
+            "rebuild_kerep",
+            "build_exec_dbg"
         ],
         "options": {
           "cwd": "${workspaceFolder}"
