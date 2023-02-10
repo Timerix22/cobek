@@ -29,24 +29,12 @@ Maybe _throw_wrongchar(SharedLexerData* sld){
     exit(96);
 }
 #define throw_wrongchar(freeMem) { freeMem; return _throw_wrongchar(sld); }
-    
-#define addTok(id) Autoarr_add(tokens, default_tokens[id])
-    
-void _addTok_ifnext(char next, TokenId yes, TokenId no, SharedLexerData* sld){
-    if(*(++source)==next){
-        addTok(yes);
-    }
-    else {
-        source--;
-        addTok(no);
-    }
-}
-#define addTok_ifnext(nextChar, yesTok, noTok) _addTok_ifnext(nextChar, yesTok, noTok, sld)
 
 // adds <label> to <tokens> as tok_label or tok_number
 void _tryAddLabel(SharedLexerData* sld){
     if(label.length==0) return;
-    Unitype uni=ST_pullString(keywordsSearchTree,label);
+
+    Unitype uni=ST_pullString(keywordsSearchTree, label);
     if(uni.VoidPtr!=NULL) // built-in keyword
         Autoarr_add(tokens, *(Token*)uni.VoidPtr);
     else {          // user-defined label
@@ -54,7 +42,7 @@ void _tryAddLabel(SharedLexerData* sld){
         ut.value=string_extract(label);
         switch(*label.ptr){
             case '0': case '1': case '2': case '3': case '4':
-            case '5': case '6': case '7': case '8': case '9': 
+            case '5': case '6': case '7': case '8': case '9':
                 ut.id=tok_number;
                 break;
             default:
@@ -63,10 +51,21 @@ void _tryAddLabel(SharedLexerData* sld){
         }
         Autoarr_add(tokens, ut);
     }
-    
-    label=(string){source,0};
+   
+    label=(string){source, 0};
 };
 #define tryAddLabel() _tryAddLabel(sld)
+   
+#define addDefTok(id) tryAddLabel(); Autoarr_add(tokens, default_tokens[id])
+   
+void _addDefTok_ifnext(char next, TokenId yes, TokenId no, SharedLexerData* sld){
+    if(*(source+1)==next){
+        source++;
+        addDefTok(yes);
+    }
+    else addDefTok(no);
+}
+#define addDefTok_ifnext(nextChar, yesTok, noTok) _addDefTok_ifnext(nextChar, yesTok, noTok, sld)
 
 // returns text in quotes or error
 Maybe _readString(char quotChar, SharedLexerData* sld){
@@ -82,7 +81,7 @@ Maybe _readString(char quotChar, SharedLexerData* sld){
                 char* extracted=string_extract(str);
                 return SUCCESS(UniHeapPtr(char, extracted));
             }
-        } 
+        }
         else prevIsBackslash= c=='\\' && !prevIsBackslash;
     }
     source=srcFirst;
@@ -94,39 +93,28 @@ Maybe _readString(char quotChar, SharedLexerData* sld){
 Maybe _lexan(SharedLexerData* sld){
     char c;
     source--;
-    while ((c=*++source)) switch(c){
+    while ((c=*++source)) {
+        // tryAddLabel() resets label.length, but label.ptr still pointing to prev token beginning
+        if(label.length==0)
+            label.ptr=source;
+
+        switch(c){
         case ' ': case '\t':
         case '\r': case '\n':
             tryAddLabel();
             break;
-        case '(':
-            tryAddLabel();
-            addTok(tok_lbracket);
-            break;
-        case '{':
-            tryAddLabel();
-            addTok(tok_lbracket_fi);
-            break;
-        case '[':
-            tryAddLabel();
-            addTok(tok_lbracket_sq);
-            break;
-        case ')':
-            tryAddLabel();
-            addTok(tok_rbracket);
-            break;
-        case '}':
-            tryAddLabel();
-            addTok(tok_rbracket_fi);
-            break;
-        case ']':
-            tryAddLabel();
-            addTok(tok_rbracket_sq);
-            break;
+		
+        case '(': addDefTok(tok_lbracket);    break;
+        case '{': addDefTok(tok_lbracket_fi); break;
+        case '[': addDefTok(tok_lbracket_sq); break;
+        case ')': addDefTok(tok_rbracket);    break;
+        case '}': addDefTok(tok_rbracket_fi); break;
+        case ']': addDefTok(tok_rbracket_sq); break;
+		
         case '\'':
             tryAddLabel();
             try(readString('\''), maybeC, ;){
-                Token ctok={ 
+                Token ctok={
                     .id=tok_character,
                     .value=(char*)maybeC.value.VoidPtr
                 };
@@ -136,44 +124,33 @@ Maybe _lexan(SharedLexerData* sld){
         case '"':
             tryAddLabel();
             try(readString('"'), maybeS, ;){
-                Token stok={ 
+                Token stok={
                     .id=tok_string,
                     .value=(char*)maybeS.value.VoidPtr
                 };
                 Autoarr_add(tokens, stok);
             }
             break;
-        case '<':
-            tryAddLabel();
-            addTok(tok_less);
-            break;
-        case '>':
-            tryAddLabel();
-            addTok(tok_more);
-            break;
-        case '+':
-            tryAddLabel();
-            addTok(tok_plus);
-            break;
-        case '-':
-            tryAddLabel();
-            addTok(tok_minus);
-            break;
-        case '*':
-            tryAddLabel();
-            addTok(tok_asterisk);
-            break;
+		
+        case '<': addDefTok(tok_less); break;
+        case '>': addDefTok(tok_more); break;
+        case '+': addDefTok(tok_plus); break;
+        case '-': addDefTok(tok_minus); break;
+        case '*': addDefTok(tok_asterisk); break;
+		
         case '/':
             tryAddLabel();
-            string commentStr={source,0};
+            string commentStr={source, 1};
             c=*++source;
             if(c=='/') { // single-line comment
+                commentStr.length++;
                 while((c=*++source)){
                     if(c=='\n' || c=='\r') break;
                     else commentStr.length++;
                 }
             }
             else if(c=='*') { // multi-line comment
+                commentStr.length++;
                 while((c=*++source)){
                     commentStr.length++;
                     if(c=='*' && *(++source)=='/') break;
@@ -181,80 +158,37 @@ Maybe _lexan(SharedLexerData* sld){
             }
             else { // not comment
                 source--;
-                addTok(tok_slash);
+                addDefTok(tok_slash);
                 break;
             }
             Token comTok={
                 .value=string_extract(commentStr),
                 .id=tok_comment
             };
-            Autoarr_add(tokens,comTok);
+            Autoarr_add(tokens, comTok);
             break;
-        case '=':
-            tryAddLabel();
-            addTok_ifnext('=',tok_equals,tok_assign);
-            break;
-        case '!':
-            tryAddLabel();
-            addTok_ifnext('=',tok_not_equals,tok_not);
-            break;
-        case '&':
-            tryAddLabel();
-            addTok_ifnext('&',tok_and_d,tok_and);
-            break;
-        case '|':
-            tryAddLabel();
-            addTok_ifnext('|',tok_or_d,tok_or);
-            break;
-        case '?':
-            tryAddLabel();
-            addTok_ifnext('?',tok_question_d,tok_question);
-            break;
-        case ':':
-            tryAddLabel();
-            addTok(tok_colon);
-            break;
-        case ';':
-            tryAddLabel();
-            addTok(tok_semicolon);
-            break;
-        case '.':
-            tryAddLabel();
-            addTok(tok_point);
-            break;
-        case ',':
-            tryAddLabel();
-            addTok(tok_comma);
-            break;
-        case '~':
-            tryAddLabel();
-            addTok(tok_tilda);
-            break;
-        case '\\':
-            tryAddLabel();
-            addTok(tok_backslash);
-            break;
-        case '%':
-            tryAddLabel();
-            addTok(tok_percent);
-            break;
-        case '^':
-            tryAddLabel();
-            addTok(tok_xor);
-            break;
-        case '$':
-            tryAddLabel();
-            addTok(tok_dollar);
-            break;
-        case '@':
-            tryAddLabel();
-            addTok(tok_at);
-            break;
+		
+        case '=': addDefTok_ifnext('=', tok_equals, tok_assign);      break;
+        case '!': addDefTok_ifnext('=', tok_not_equals, tok_not);     break;
+        case '&': addDefTok_ifnext('&', tok_and_d, tok_and);          break;
+        case '|': addDefTok_ifnext('|', tok_or_d, tok_or);            break;
+        case '?': addDefTok_ifnext('?', tok_question_d, tok_question);break;
+        case ':': addDefTok(tok_colon);      break;
+        case ';': addDefTok(tok_semicolon);  break;
+        case '.': addDefTok(tok_point);      break;
+        case ',': addDefTok(tok_comma);     break;
+        case '~': addDefTok(tok_tilda);      break;
+        case '\\': addDefTok(tok_backslash); break;
+        case '%': addDefTok(tok_percent);    break;
+        case '^': addDefTok(tok_xor);        break;
+        case '$': addDefTok(tok_dollar);     break;
+        case '@': addDefTok(tok_at);         break;
+		
         default:
             label.length++;
             break;
+        }
     }
-    
     return SUCCESS(UniHeapPtr(Autoarr(Token), tokens));
 }
 
@@ -263,9 +197,9 @@ Maybe lexan(char* _source, char* _filename){
     SharedLexerData sld={
         ._source=_source,
         ._filename=_filename,
-        ._tokens=Autoarr_create(Token,64,1024),
-        ._label={_source,0},
-        ._line={_source,0},
+        ._tokens=Autoarr_create(Token, 64, 1024),
+        ._label={_source, 0},
+        ._line={_source, 0},
         ._linenum=0,
         ._charnum=0
     };
