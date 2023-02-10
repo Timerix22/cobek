@@ -9,10 +9,10 @@
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "build_cb2c_dbg",
-            "program": "bin/cb2c.com",
+            "program": "cb2c.com",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/bin",
             "environment": [],
             "externalConsole": false,
             "internalConsoleOptions": "openOnSessionStart",
@@ -34,19 +34,6 @@
                     "ignoreFailures": true
                 }
             ]
-        },
-        
-        {
-            "name": "(Windows) Debug",
-            "type": "cppvsdbg",
-            "request": "launch",
-            "preLaunchTask": "build_cb2c_dbg",
-            "cwd": "${workspaceRoot}\\bin",
-            "program": "${workspaceRoot}\\bin\\cb2c.com",
-            "args": [],
-            "environment": [],
-            "stopAtEntry": false,
-            "console": "integratedTerminal"
         }
     ]
 }
