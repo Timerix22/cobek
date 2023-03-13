@@ -1,35 +1,46 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Debug",
+            "name": "gdb_debug_unix",
             "type": "cppdbg",
             "request": "launch",
-            "preLaunchTask": "build_cb2c_dbg",
-            "program": "cb2c.com",
-            "args": [],
+            "program": "${workspaceFolder}/bin/cobek",
+            "preLaunchTask": "build_exec_dbg",
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/bin",
-            "environment": [],
             "externalConsole": false,
-            "internalConsoleOptions": "openOnSessionStart",
-            "pipeTransport": {
-                "debuggerPath": "gdb",
-                "pipeProgram": "bash",
-                "pipeArgs": ["-c"],
-                "pipeCwd": ""
-            },
+            "MIMode": "gdb",
+            "miDebuggerPath": "gdb",
             "setupCommands": [
                 {
-                    "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 },
                 {
-                    "description":  "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        // the only difference is .exe
+        {
+            "name": "gdb_debug_win",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/cobek.exe",
+            "preLaunchTask": "build_exec_dbg",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/bin",
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "gdb",
+            "setupCommands": [
+                {
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
                     "text": "-gdb-set disassembly-flavor intel",
                     "ignoreFailures": true
                 }

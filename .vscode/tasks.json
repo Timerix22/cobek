@@ -1,15 +1,13 @@
-
 {
     
     "version": "2.0.0",
     "tasks": [
       {
-        "label": "build_cb2c_dbg",
+        "label": "build_exec_dbg",
         "detail": "build project with debug symbols",
         "type": "cppbuild",
         "command": "make",
         "args": [
-            "rebuild_kerep",
             "build_exec_dbg"
         ],
         "options": {
