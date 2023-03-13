@@ -8,7 +8,7 @@ Autoarr(Token)* parseFile(char* filename){
         File* srcfile=m_srcfile.value.VoidPtr;
     char* src;
     tryLast(file_readAll(srcfile, &src), m_srcLen)
-        uint64 srcLen=m_srcLen.value.UInt64;
+        u64 srcLen=m_srcLen.value.UInt64;
     kprintf("srclen: %lu\n", srcLen);
     src[srcLen]='\0';
     tryLast(lexan(src, filename), m_tokens)
@@ -42,10 +42,10 @@ int main(const int argc, const char* const* argv){
     }
     kprintf("\n"); return 0;
     // kerep type system
-    ktDescriptors_beginInit();
-    ktDescriptors_initKerepTypes();
-    ktDescriptors_initCbLexerTypes();
-    ktDescriptors_endInit();
+    kt_beginInit();
+    kt_initKerepTypes();
+    kt_initCbLexerTypes();
+    kt_endInit();
     // keywords search tree
     init_keywordsSearchTree();
     kprint(kp_s|kp_fgGray, "keywordsSearchTree: ", kp_h|kp_pre, keywordsSearchTree, kp_c, '\n');

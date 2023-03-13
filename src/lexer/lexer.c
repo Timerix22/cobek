@@ -1,16 +1,16 @@
 #include "lexer.h"
 #include "../../kerep/src/String/string.h"
 
-typedef struct SharedLexerData{
+STRUCT(SharedLexerData,
     char* _source;
     char* _filename;
     Autoarr(Token)* _tokens;
     string _context;
     string _line;
     string _label;
-    uint32 _linenum;
-    uint32 _charnum;
-} SharedLexerData;
+    u32 _linenum;
+    u32 _charnum;
+)
 
 #define source sld->_source
 #define filename sld->_filename

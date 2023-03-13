@@ -6,4 +6,4 @@
 //Autoarr(Token)*
 Maybe lexan(char* source, char* filename);
 
-void ktDescriptors_initCbLexerTypes();
+void kt_initCbLexerTypes();

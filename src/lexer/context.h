@@ -3,35 +3,35 @@
 #include "../../kerep/src/base/base.h"
 #include "tokens.h"
 
-typedef struct ContextStruct Context;
 
-PACK_ENUM(ContextType,
+PACKED_ENUM(ContextType,
     CT_Namespace,
-    CT_Function,
-    CT_Class
+    CT_Class,
+    CT_Function
 )
 
-struct ContextStruct {
+typedef struct Context Context;
+STRUCT(Context,
     char* name;
     Context* parent;
     Autoarr(Token)* tokens;
     ContextType type;
-};
+)
 
-typedef struct NamespaceContext{
+STRUCT(NamespaceContext,
     Context base;
-} NamespaceContext;
+)
 
-typedef struct FunctionContext {
+STRUCT(ClassContext,
+    Context base;
+    Autoarr(Token)* attributes;
+    Token accessModifier;
+)
+
+STRUCT(FunctionContext,
     Context base;
     Autoarr(Token)* arguments;
     Autoarr(Token)* attributes;
     Token accessModifier;
     Token returnType;
-} FunctionContext;
-
-typedef struct ClassContext {
-    Context base;
-    Autoarr(Token)* attributes;
-    Token accessModifier;
-} ClassContext;
+)
