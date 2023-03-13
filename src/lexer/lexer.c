@@ -1,207 +1,43 @@
 #include "lexer.h"
 #include "../../kerep/src/String/string.h"
+#include "../../kerep/src/Filesystem/filesystem.h"
 
-STRUCT(SharedLexerData,
-    char* _source;
-    char* _filename;
-    Autoarr(Token)* _tokens;
-    string _context;
-    string _line;
-    string _label;
-    u32 _linenum;
-    u32 _charnum;
-)
+Maybe __Lexer_analize(Lexer* lex, char* _filename, char* _source);
 
-#define source sld->_source
-#define filename sld->_filename
-#define tokens sld->_tokens
-#define context sld->_context
-#define line sld->_line
-#define label sld->_label
-#define linenum sld->_linenum
-#define charnum sld->_charnum
-
-Maybe _throw_wrongchar(SharedLexerData* sld){
-    char* errline=string_extract(line);
-    char* _context=string_extract(context);
-    printf("\n\e[91mwrong char <%c> at [%s:%u:%u %s]\n >>> %s\n",
-                source[charnum], filename,linenum,charnum,_context, errline);
-    exit(96);
+Lexer* Lexer_create(){
+    Lexer* lex=malloc(sizeof(*lex));
+    *lex=(Lexer){0};
+    lex->analize=__Lexer_analize;
+    lex->keywordSearchTree=STNode_create();
+    for(TokenId keywordId=0; keywordId<=tok_typeof; keywordId++){
+        const Token* keywordptr=&default_tokens[keywordId];
+        Unitype uni=UniStackPtr(Token, keywordptr);
+        ST_push(lex->keywordSearchTree, keywordptr->value, uni);
+    }
+    return lex;
 }
-#define throw_wrongchar(freeMem) { freeMem; return _throw_wrongchar(sld); }
 
-// adds <label> to <tokens> as tok_label or tok_number
-void _tryAddLabel(SharedLexerData* sld){
-    if(label.length==0) return;
-
-    Unitype uni=ST_pullString(keywordsSearchTree, label);
-    if(uni.VoidPtr!=NULL) // built-in keyword
-        Autoarr_add(tokens, *(Token*)uni.VoidPtr);
-    else {          // user-defined label
-        Token ut;
-        ut.value=string_extract(label);
-        switch(*label.ptr){
-            case '0': case '1': case '2': case '3': case '4':
-            case '5': case '6': case '7': case '8': case '9':
-                ut.id=tok_number;
-                break;
-            default:
-                ut.id=tok_label;
-                break;
-        }
-        Autoarr_add(tokens, ut);
-    }
-   
-    label=(string){source, 0};
-};
-#define tryAddLabel() _tryAddLabel(sld)
-   
-#define addDefTok(id) tryAddLabel(); Autoarr_add(tokens, default_tokens[id])
-   
-void _addDefTok_ifnext(char next, TokenId yes, TokenId no, SharedLexerData* sld){
-    if(*(source+1)==next){
-        source++;
-        addDefTok(yes);
-    }
-    else addDefTok(no);
+void Lexer_freeMembers(void* _l){
+    Lexer* lex=(Lexer*)_l;
+    STNode_free(lex->keywordSearchTree);
 }
-#define addDefTok_ifnext(nextChar, yesTok, noTok) _addDefTok_ifnext(nextChar, yesTok, noTok, sld)
 
-// returns text in quotes or error
-Maybe _readString(char quotChar, SharedLexerData* sld){
-    char c;
-    bool prevIsBackslash=false;
-    char* srcFirst=source;
-    while ((c=*++source)){
-        if(c==quotChar) {
-            if(prevIsBackslash) // \"
-                prevIsBackslash=false;
-            else { // "
-                string str={srcFirst, source-srcFirst+1};
-                char* extracted=string_extract(str);
-                return SUCCESS(UniHeapPtr(char, extracted));
-            }
-        }
-        else prevIsBackslash= c=='\\' && !prevIsBackslash;
-    }
-    source=srcFirst;
-    throw_wrongchar(;);
+kt_define(Lexer, Lexer_freeMembers, NULL)
+
+void Lexer_destroy(Lexer* lex){
+    Lexer_freeMembers(lex);
+    free(lex);
 }
-#define readString(quotChar) _readString(quotChar, sld)
 
-
-Maybe _lexan(SharedLexerData* sld){
-    char c;
-    source--;
-    while ((c=*++source)) {
-        // tryAddLabel() resets label.length, but label.ptr still pointing to prev token beginning
-        if(label.length==0)
-            label.ptr=source;
-
-        switch(c){
-        case ' ': case '\t':
-        case '\r': case '\n':
-            tryAddLabel();
-            break;
-		
-        case '(': addDefTok(tok_lbracket);    break;
-        case '{': addDefTok(tok_lbracket_fi); break;
-        case '[': addDefTok(tok_lbracket_sq); break;
-        case ')': addDefTok(tok_rbracket);    break;
-        case '}': addDefTok(tok_rbracket_fi); break;
-        case ']': addDefTok(tok_rbracket_sq); break;
-		
-        case '\'':
-            tryAddLabel();
-            try(readString('\''), maybeC, ;){
-                Token ctok={
-                    .id=tok_character,
-                    .value=(char*)maybeC.value.VoidPtr
-                };
-                Autoarr_add(tokens, ctok);
-            }
-            break;
-        case '"':
-            tryAddLabel();
-            try(readString('"'), maybeS, ;){
-                Token stok={
-                    .id=tok_string,
-                    .value=(char*)maybeS.value.VoidPtr
-                };
-                Autoarr_add(tokens, stok);
-            }
-            break;
-		
-        case '<': addDefTok(tok_less); break;
-        case '>': addDefTok(tok_more); break;
-        case '+': addDefTok(tok_plus); break;
-        case '-': addDefTok(tok_minus); break;
-        case '*': addDefTok(tok_asterisk); break;
-		
-        case '/':
-            tryAddLabel();
-            string commentStr={source, 1};
-            c=*++source;
-            if(c=='/') { // single-line comment
-                commentStr.length++;
-                while((c=*++source)){
-                    if(c=='\n' || c=='\r') break;
-                    else commentStr.length++;
-                }
-            }
-            else if(c=='*') { // multi-line comment
-                commentStr.length++;
-                while((c=*++source)){
-                    commentStr.length++;
-                    if(c=='*' && *(++source)=='/') break;
-                }
-            }
-            else { // not comment
-                source--;
-                addDefTok(tok_slash);
-                break;
-            }
-            Token comTok={
-                .value=string_extract(commentStr),
-                .id=tok_comment
-            };
-            Autoarr_add(tokens, comTok);
-            break;
-		
-        case '=': addDefTok_ifnext('=', tok_equals, tok_assign);      break;
-        case '!': addDefTok_ifnext('=', tok_not_equals, tok_not);     break;
-        case '&': addDefTok_ifnext('&', tok_and_d, tok_and);          break;
-        case '|': addDefTok_ifnext('|', tok_or_d, tok_or);            break;
-        case '?': addDefTok_ifnext('?', tok_question_d, tok_question);break;
-        case ':': addDefTok(tok_colon);      break;
-        case ';': addDefTok(tok_semicolon);  break;
-        case '.': addDefTok(tok_point);      break;
-        case ',': addDefTok(tok_comma);     break;
-        case '~': addDefTok(tok_tilda);      break;
-        case '\\': addDefTok(tok_backslash); break;
-        case '%': addDefTok(tok_percent);    break;
-        case '^': addDefTok(tok_xor);        break;
-        case '$': addDefTok(tok_dollar);     break;
-        case '@': addDefTok(tok_at);         break;
-		
-        default:
-            label.length++;
-            break;
-        }
-    }
+///@return Maybe<Autoarr(Token)*>
+Maybe Lexer_parseFile(Lexer* lex, char* src_file_name){
+    try(file_open(src_file_name, FileOpenMode_Read), m_src_file,;)
+        File* src_file=m_src_file.value.VoidPtr;
+    char* src_text;
+    try(file_readAll(src_file, &src_text), m_src_len, file_close(src_file))
+        u64 src_len=m_src_len.value.UInt64;
+    kprintf("srclen: %lu\n", src_len);
+    try(Lexer_parseText(lex, src_file_name, src_text), m_tokens, file_close(src_file))
+        Autoarr(Token)* tokens=m_tokens.value.VoidPtr;
     return SUCCESS(UniHeapPtr(Autoarr(Token), tokens));
-}
-
-
-Maybe lexan(char* _source, char* _filename){
-    SharedLexerData sld={
-        ._source=_source,
-        ._filename=_filename,
-        ._tokens=Autoarr_create(Token, 64, 1024),
-        ._label={_source, 0},
-        ._line={_source, 0},
-        ._linenum=0,
-        ._charnum=0
-    };
-    return _lexan(&sld);
 }

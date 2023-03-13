@@ -2,4 +2,7 @@
 
 #include "../lexer/lexer.h"
 
-char* contextToC(void* context);
+/// @brief generates C source code from tokens
+/// @param context contains code tokens
+/// @return Maybe<char*> C source code 
+Maybe translateToC(Context* context);

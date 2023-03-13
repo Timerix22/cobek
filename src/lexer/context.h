@@ -5,15 +5,15 @@
 
 
 PACKED_ENUM(ContextType,
-    CT_Namespace,
-    CT_Class,
-    CT_Function
+    ContextType_Namespace,
+    ContextType_Class,
+    ContextType_Function
 )
 
-typedef struct Context Context;
 STRUCT(Context,
     char* name;
-    Context* parent;
+    char* namespace; /* nullable */
+    Context* parent; /* nullable */
     Autoarr(Token)* tokens;
     ContextType type;
 )
