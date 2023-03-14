@@ -15,28 +15,24 @@ void _tryAddLabel(Lexer* lex){
 
     Unitype uni=ST_pullString(lex->keywordSearchTree, lex->label);
     if(uni.VoidPtr!=NULL) // built-in keyword
-        Autoarr_add(lex->tokens, *(Token*)uni.VoidPtr);
+        LinkedList_addToEnd(lex->tokens, LLNode_create(Token,*(Token*)uni.VoidPtr));
     else {          // user-defined lex->label
-        Token ut;
-        ut.value=string_extract(lex->label);
-        ut.on_heap=true;
-        switch(*lex->label.ptr){
+        TokenId udt_id=tok_label;
+        switch(*lex->label.ptr){ // starts with number
             case '0': case '1': case '2': case '3': case '4':
             case '5': case '6': case '7': case '8': case '9':
-                ut.id=tok_number;
-                break;
-            default:
-                ut.id=tok_label;
+                udt_id=tok_number;
                 break;
         }
-        Autoarr_add(lex->tokens, ut);
+        Token udt=Token_createUD(udt_id, string_extract(lex->label));
+        LinkedList_addToEnd(lex->tokens, LLNode_create(Token,udt));
     }
   
     lex->label=(string){lex->source, 0};
 };
 #define tryAddLabel() _tryAddLabel(lex)
   
-#define addDefTok(id) { tryAddLabel(); Autoarr_add(lex->tokens, default_tokens[id]); }
+#define addDefTok(id) { tryAddLabel(); LinkedList_addToEnd(lex->tokens, LLNode_create(Token,default_tokens[id])); }
   
 void _addDefTok_ifnext(Lexer* lex, char next, TokenId yes, TokenId no){
     if(*(lex->source+1)==next){
@@ -73,7 +69,9 @@ Maybe _readString(Lexer* lex, char quotChar){
 Maybe __Lexer_analize(Lexer* lex, char* _filename, char* _source){
     lex->filename=_filename;
     lex->source=_source;
-    lex->tokens=Autoarr_create(Token, 64, 1024);
+    if(lex->tokens!=NULL)
+        LinkedList_free(lex->tokens);
+    lex->tokens=LinkedList_create(Token);
     lex->label=(string){_source, 0};
     lex->line=(string){_source, 0};
     lex->linenum=0;
@@ -101,22 +99,16 @@ Maybe __Lexer_analize(Lexer* lex, char* _filename, char* _source){
 		
         case '\'':
             tryAddLabel();
-            try(readString('\''), maybeC, ;){
-                Token ctok={
-                    .id=tok_character,
-                    .value=(char*)maybeC.value.VoidPtr
-                };
-                Autoarr_add(lex->tokens, ctok);
+            try(readString('\''), m_ch, ;){
+                Token ctok=Token_createUD(tok_character, m_ch.value.VoidPtr);
+                LinkedList_addToEnd(lex->tokens, LLNode_create(Token,ctok));
             }
             break;
         case '"':
             tryAddLabel();
-            try(readString('"'), maybeS, ;){
-                Token stok={
-                    .id=tok_string,
-                    .value=(char*)maybeS.value.VoidPtr
-                };
-                Autoarr_add(lex->tokens, stok);
+            try(readString('"'), m_Str, ;){
+                Token stok=Token_createUD(tok_string, m_Str.value.VoidPtr);
+                LinkedList_addToEnd(lex->tokens, LLNode_create(Token,stok));
             }
             break;
 		
@@ -150,11 +142,8 @@ Maybe __Lexer_analize(Lexer* lex, char* _filename, char* _source){
                 addDefTok(tok_slash);
                 break;
             }
-            Token comTok={
-                .value=string_extract(commentStr),
-                .id=tok_comment
-            };
-            Autoarr_add(lex->tokens, comTok);
+            Token comTok=Token_createUD(tok_comment, string_extract(commentStr));
+            LinkedList_addToEnd(lex->tokens, LLNode_create(Token,comTok));
             break;
 		
         case '=': addDefTok_ifnext('=', tok_equal, tok_assign);       break;
@@ -180,5 +169,5 @@ Maybe __Lexer_analize(Lexer* lex, char* _filename, char* _source){
     }
     
     tryAddLabel();
-    return SUCCESS(UniHeapPtr(Autoarr(Token), lex->tokens));
+    return SUCCESS(UniHeapPtr(LinkedList(Token), lex->tokens));
 }

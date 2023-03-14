@@ -11,7 +11,7 @@ STRUCT(Lexer,
     
     char* source;
     char* filename;
-    Autoarr(Token)* tokens;
+    LinkedList(Token)* tokens;
     string context;
     string line;
     string label;
@@ -21,12 +21,12 @@ STRUCT(Lexer,
 
 Lexer* Lexer_create();
 void Lexer_destroy(Lexer* lex);
-///@return Maybe<Autoarr(Token)*>
+///@return Maybe<LinkedList(Token)*>
 
-///@return Maybe<Autoarr(Token)*>
+///@return Maybe<LinkedList(Token)*>
 Maybe Lexer_parseFile(Lexer* lex, char* src_file_name);
 
-///@return Maybe<Autoarr(Token)*>
+///@return Maybe<LinkedList(Token)*>
 static inline Maybe Lexer_parseText(Lexer* lex, char* src_file_name, char* src_file_text){
     return lex->analize(lex, src_file_name, src_file_text);
 }

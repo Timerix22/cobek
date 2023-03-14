@@ -1,7 +1,6 @@
 #include "../../kerep/src/kprint/kprint.h"
 #include "../../kerep/src/Filesystem/filesystem.h"
 #include "cb2c.h"
-#include "../lexer/lexer.h"
 
 char cb2c_version[]="0.0.1";
 
@@ -117,12 +116,14 @@ i32 main(const int argc, const char* const* argv){
     
     Autoarr_foreach(source_files, src_file_name, ({
         tryLast(Lexer_parseFile(lexer, src_file_name), m_tokens)
-            Autoarr(Token)* tokens=m_tokens.value.VoidPtr;
-        kprintf("tokens: %u\n", Autoarr_length(tokens));
-        Autoarr_foreach(tokens, tok, kprintf("%u %s\n",tok.id, tok.value));
+            LinkedList(Token)* tokens=m_tokens.value.VoidPtr;
+        kprintf("tokens count: %u\n", tokens->count);
+        LinkedList_foreach(tokens, tokNode, 
+            kprintf("%u %s\n", tokNode->value.id, tokNode->value.value));
+        char* basename=path_basename(src_file_name, false);
         NamespaceContext file_context={
             .base={
-                .name=path_basename(src_file_name, false),
+                .name=basename,
                 .namespace=NULL,
                 .parent=NULL,
                 .type=ContextType_Namespace,
@@ -138,16 +139,19 @@ i32 main(const int argc, const char* const* argv){
             generated_file_name=cptr_concat(file_context.base.namespace,".",file_context.base.name,".g.c");
         else generated_file_name=cptr_concat(file_context.base.name,".g.c");
         tryLast(file_open(generated_file_name, FileOpenMode_Write), m_generated_file)
-            File* generated_file=m_generated_file.value.VoidPtr;
+            FileHandle generated_file=m_generated_file.value.VoidPtr;
         kprintf("created file %s\n", generated_file_name);
         tryLast(file_writeCptr(generated_file, generated_code),_m_1885);
         tryLast(file_close(generated_file),_m_14415);
         kprintf("source code has been written to the file\n");
+        free(basename);
+        LinkedList_free(tokens);
         free(generated_code);
         free(generated_file_name);
     }));
 
     Autoarr_free(source_files, true);
     Lexer_destroy(lexer);
+    kt_free();
     return 0;
 }

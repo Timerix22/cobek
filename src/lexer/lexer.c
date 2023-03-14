@@ -29,15 +29,17 @@ void Lexer_destroy(Lexer* lex){
     free(lex);
 }
 
-///@return Maybe<Autoarr(Token)*>
+///@return Maybe<LinkedList(Token)*>
 Maybe Lexer_parseFile(Lexer* lex, char* src_file_name){
     try(file_open(src_file_name, FileOpenMode_Read), m_src_file,;)
-        File* src_file=m_src_file.value.VoidPtr;
+        FileHandle src_file=m_src_file.value.VoidPtr;
     char* src_text;
     try(file_readAll(src_file, &src_text), m_src_len, file_close(src_file))
         u64 src_len=m_src_len.value.UInt64;
+    try(file_close(src_file),_m_215, free(src_text));
     kprintf("srclen: %lu\n", src_len);
-    try(Lexer_parseText(lex, src_file_name, src_text), m_tokens, file_close(src_file))
-        Autoarr(Token)* tokens=m_tokens.value.VoidPtr;
-    return SUCCESS(UniHeapPtr(Autoarr(Token), tokens));
+    try(Lexer_parseText(lex, src_file_name, src_text), m_tokens,;)
+        LinkedList(Token)* tokens=m_tokens.value.VoidPtr;
+    free(src_text);
+    return SUCCESS(UniHeapPtr(LinkedList(Token), tokens));
 }

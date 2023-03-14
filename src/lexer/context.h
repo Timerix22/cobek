@@ -14,7 +14,7 @@ STRUCT(Context,
     char* name;
     char* namespace; /* nullable */
     Context* parent; /* nullable */
-    Autoarr(Token)* tokens;
+    LinkedList(Token)* tokens;
     ContextType type;
 )
 
@@ -24,14 +24,14 @@ STRUCT(NamespaceContext,
 
 STRUCT(ClassContext,
     Context base;
-    Autoarr(Token)* attributes;
+    LinkedList(Token)* attributes;
     Token accessModifier;
 )
 
 STRUCT(FunctionContext,
     Context base;
-    Autoarr(Token)* arguments;
-    Autoarr(Token)* attributes;
+    LinkedList(Token)* arguments;
+    LinkedList(Token)* attributes;
     Token accessModifier;
     Token returnType;
 )

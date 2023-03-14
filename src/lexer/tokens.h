@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../kerep/src/Autoarr/Autoarr.h"
+#include "../../kerep/src/LinkedList/LinkedList.h"
 #include "../../kerep/src/SearchTree/SearchTree.h"
 
 PACKED_ENUM(TokenId,
@@ -104,7 +104,9 @@ STRUCT(Token,
     TokenId id;
     bool on_heap; // allocated on stack or heap
 )
-Autoarr_declare(Token)
+LinkedList_declare(Token)
+/// user-defined token constructor
+#define Token_createUD(ID, VALUE) (Token){ .id=ID, .value=VALUE, .on_heap=true }
 
 static const Token default_tokens[]={
     /* base types */

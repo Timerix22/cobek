@@ -11,4 +11,4 @@ char* Token_toString(void* _t, u32 fmt){
 }
 
 kt_define(Token, Token_freeMembers, Token_toString);
-Autoarr_define(Token, false)
+LinkedList_define(Token, false)

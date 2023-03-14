@@ -4,11 +4,11 @@
 #define addc(C) StringBuilder_append_char(b, C);
 #define adds(S) StringBuilder_append_cptr(b, S);
 
-void appendToken(StringBuilder* b, Token tok, u16* _tab_count){
+void appendToken(StringBuilder* b, LLNode(Token)* tokNode, u16* _tab_count){
     u16 tab_count=*_tab_count;
-    adds(tok.value)
+    adds(tokNode->value.value)
 
-    switch(tok.id){
+    switch(tokNode->value.id){
         case tok_lbracket_fi:
             tab_count++;
             goto add_new_line;
@@ -48,7 +48,7 @@ Maybe appendNamespaceContext(StringBuilder* b, NamespaceContext* context){
     adds(" */\n\n")
 
     u16 tab_count=0;
-    Autoarr_foreach(context->base.tokens, tok, appendToken(b, tok, &tab_count));
+    LinkedList_foreach(context->base.tokens, tok, appendToken(b, tok, &tab_count));
     addc('\n');
 
     return MaybeNull;
