@@ -4,3 +4,6 @@
 [submodule "cbuild"]
 	path = cbuild
 	url = https://github.com/Timerix22/cbuild.git
+[submodule "GraphC"]
+	path = GraphC
+	url = https://github.com/Timerix22/GraphC.git
